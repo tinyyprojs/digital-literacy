@@ -73,7 +73,7 @@ export function ScamDetector() {
         })
       }
     } catch (err) {
-      console.error("[v0] Error analyzing message:", err)
+      console.error("Error analyzing message:", err)
       setError({
         message: "Failed to analyze message. Please check your connection and try again.",
       })
@@ -106,13 +106,12 @@ export function ScamDetector() {
                 Message Analysis
               </CardTitle>
               <CardDescription className="text-foreground">
-                Enter the suspicious message below. Our AI will analyze it for common scam patterns and provide a
-                detailed risk assessment.
+                Paste the message below. And the AI will analyze it for scam patterns and provide an assessment.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
-                placeholder="Paste the message you want to analyze here... (e.g., an email, text message, or social media DM)"
+                placeholder="Paste the message here! (e.g., an email, text message, etc)"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className="min-h-[200px] resize-none bg-background"
@@ -222,8 +221,8 @@ export function ScamDetector() {
                 <div className="space-y-1">
                   <p className="text-sm font-semibold text-warning-foreground">Important Note</p>
                   <p className="text-sm text-warning-foreground/80 leading-relaxed">
-                    This AI tool provides guidance but is not 100% accurate. Always use your judgment and verify
-                    suspicious messages through official channels before taking any action.
+                    This AI tool help provides guidance, it is not 100% accurate. Always verify
+                    suspicious messages through official sources before taking any action.
                   </p>
                 </div>
               </div>

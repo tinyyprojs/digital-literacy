@@ -8,7 +8,7 @@ export function Navigation() {
       <div className="container flex items-center justify-between h-16 max-w-7xl mx-auto px-4">
         <Link href="/" className="flex items-center gap-2">
           <Shield className="w-6 h-6 text-primary" />
-          <span className="font-semibold text-lg">Digital Defense Hub</span>
+          <span className="font-semibold text-lg">Digital Literacy, Awareness & Defense</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-6">

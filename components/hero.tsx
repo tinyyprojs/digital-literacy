@@ -9,17 +9,17 @@ export function Hero() {
         <div className="text-center max-w-4xl mx-auto space-y-8">
           <div className="inline-block">
             <span className="text-sm font-medium text-primary px-4 py-1.5 bg-primary/10 rounded-full border border-primary/20">
-              Digital Security
+              Digital Literacy, Awareness & Defense Project
             </span>
           </div>
 
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance">
-            Stay Safe in the Digital World
+            Avoiding Scams in the Digital World
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground text-pretty max-w-3xl mx-auto leading-relaxed">
             {
-              "Empower yourself with knowledge to identify threats, avoid scams, and protect your digital identity with our AI-powered defense tools."
+              "Learn how to identify threats, avoid scams, and protect your digital identity with AI-powered defense tools."
             }
           </p>
 
@@ -37,7 +37,7 @@ export function Hero() {
               <Shield className="w-10 h-10 text-primary mb-4" />
               <h3 className="font-semibold mb-2">Learn</h3>
               <p className="text-sm text-muted-foreground text-center">
-                Master essential cybersecurity concepts and best practices
+                Learn cybersecurity concepts and practices
               </p>
             </div>
 
@@ -53,7 +53,7 @@ export function Hero() {
               <Lock className="w-10 h-10 text-primary mb-4" />
               <h3 className="font-semibold mb-2">Defend</h3>
               <p className="text-sm text-muted-foreground text-center">
-                Apply proven strategies to protect yourself online
+                Apply knowledge to protect yourself online
               </p>
             </div>
           </div>

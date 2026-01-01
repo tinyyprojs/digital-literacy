@@ -8,9 +8,9 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Digital Defense Hub | Cybersecurity Education & Scam Detection",
+  title: "Digital Literacy, Awareness & Defense, Cybersecurity Education & Scam Detection Project",
   description:
-    "Learn to protect yourself online with our comprehensive digital literacy resources and AI-powered scam detection tools.",
+    "Protect yourself online with educational sources and AI-powered scam detection tools.",
   generator: "v0.app",
   icons: {
     icon: [

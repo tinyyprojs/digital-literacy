@@ -25,7 +25,7 @@ const scamIndicators = [
   },
   {
     icon: AlertCircle,
-    title: "Urgent or Threatening Language",
+    title: "Uses of Threatening Language",
     description: "Scammers create panic to make you act quickly without thinking.",
     examples: [
       '"Your account will be closed in 24 hours!"',
@@ -35,13 +35,13 @@ const scamIndicators = [
   },
   {
     icon: CreditCard,
-    title: "Requests for Personal Information",
+    title: "Personal Information Requests",
     description: "Legitimate companies never ask for sensitive data via email or text.",
     examples: ["Password requests", "Social Security Number", "Credit card details or CVV", "Bank account numbers"],
   },
   {
     icon: FileText,
-    title: "Poor Grammar and Spelling",
+    title: "Poor Grammar & Spelling",
     description: "Professional companies proofread their communications. Multiple errors are red flags.",
     examples: [
       "Obvious typos and grammatical mistakes",
@@ -51,12 +51,12 @@ const scamIndicators = [
   },
   {
     icon: User,
-    title: "Impersonation Tactics",
+    title: "Impersonating Tactics",
     description: "Scammers pretend to be trusted entities like banks, government agencies, or tech support.",
     examples: [
-      "Fake IRS or tax authority messages",
+      "Fake tax authority messages",
       "Phony tech support warnings",
-      "Impostor emails from your boss or coworker",
+      "Impostor emails from others",
     ],
   },
 ]
@@ -67,26 +67,25 @@ const bestPractices = [
     tips: [
       "Enable two-factor authentication on all important accounts",
       "Never click links in unexpected emails",
-      "Verify sender identity through official channels",
+      "Verify sender identity through official sources",
       "Use email filters and spam protection",
     ],
   },
   {
     category: "Password Protection",
     tips: [
-      "Use unique passwords for each account",
-      "Enable a password manager",
+      "Enable a trusted password manager",
       "Create passwords with 12+ characters",
       "Never share passwords via email or text",
     ],
   },
   {
-    category: "Safe Browsing",
+    category: "Browsing Security",
     tips: [
       "Look for HTTPS and padlock icon in browser",
-      "Keep software and browsers updated",
+      "Consider using a VPN",
       "Use trusted antivirus software",
-      "Avoid public Wi-Fi for sensitive transactions",
+      "Avoid using public Wi-Fi",
     ],
   },
   {
@@ -94,8 +93,8 @@ const bestPractices = [
     tips: [
       "Review privacy settings regularly",
       "Be cautious about what you share publicly",
-      "Verify friend requests from people you know",
       "Report suspicious accounts and messages",
+      "Avoiding clicking links from suspicious accounts",
     ],
   },
 ]
@@ -107,8 +106,7 @@ export function EducationSection() {
         <div className="text-center space-y-4">
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Learn to Spot the Signs</h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Understanding common scam tactics is your first line of defense. Here are the key warning signs to watch
-            for.
+            Understanding common scam tactics is a good defense. Here are the signs to watch out for.
           </p>
         </div>
 
@@ -146,9 +144,9 @@ export function EducationSection() {
 
         <div className="pt-12" id="resources">
           <div className="text-center space-y-4 mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Best Practices</h2>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">What To Do?</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Follow these proven strategies to protect yourself and your data online.
+              Heres what you can do to help prevent scams.
             </p>
           </div>
 
