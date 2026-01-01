@@ -1,32 +1,16 @@
-import { generateObject } from "ai"
-import { z } from "zod"
+import { GoogleGenerativeAI } from "@google/generative-ai"
 
-const scamAnalysisSchema = z.object({
-  isScam: z.boolean().describe("Whether the message appears to be a scam"),
-  confidence: z.number().min(0).max(100).describe("Confidence level of the analysis as a percentage (0-100)"),
-  riskLevel: z.enum(["low", "medium", "high"]).describe("Overall risk level assessment"),
-  indicators: z
-    .array(z.string())
-    .describe(
-      "List of specific scam indicators found in the message (e.g., urgent language, requests for personal info, suspicious links)",
-    ),
-  recommendation: z
-    .string()
-    .describe("Actionable recommendation for the user on how to handle this message (2-3 sentences)"),
-})
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyD8IjkAlyNlxLwQ4Zyq1hGATnD6OrSXFgc")
 
-export async function POST(req: Request) {
-  try {
-    const { message } = await req.json()
+async function analyzeMessageWithRetry(message: string, retries = 3): Promise<any> {
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
+    generationConfig: {
+      responseMimeType: "application/json",
+    },
+  })
 
-    if (!message || typeof message !== "string") {
-      return Response.json({ error: "Invalid message provided" }, { status: 400 })
-    }
-
-    const { object } = await generateObject({
-      model: "openai/gpt-5-mini",
-      schema: scamAnalysisSchema,
-      prompt: `You are an expert cybersecurity analyst specializing in scam and phishing detection. Analyze this message with a CRITICAL and SUSPICIOUS mindset.
+  const systemInstruction = `You are an expert cybersecurity analyst specializing in scam and phishing detection. Analyze messages with a CRITICAL and SUSPICIOUS mindset.
 
 CRITICAL SCAM PATTERNS TO DETECT:
 
@@ -89,27 +73,94 @@ ANALYSIS REQUIREMENTS:
 - If multiple indicators are present, mark as high confidence scam
 - Provide specific, actionable warnings about what makes this suspicious
 
+RESPONSE FORMAT (JSON):
+{
+  "isScam": boolean,
+  "confidence": number (0-100),
+  "riskLevel": "low" | "medium" | "high",
+  "indicators": [list of specific scam indicators found],
+  "recommendation": "Actionable advice (2-3 sentences)"
+}
+
+Remember: It's better to be overly cautious than to miss a scam. If it feels off, it probably is.`
+
+  const prompt = `${systemInstruction}
+
 Message to analyze:
 """
 ${message}
-"""
+"""`
 
-Remember: It's better to be overly cautious than to miss a scam. If it feels off, it probably is.`,
-      maxOutputTokens: 1000,
-    })
+  for (let i = 0; i < retries; i++) {
+    try {
+      console.log(`[v0] Attempt ${i + 1} to analyze message`)
+      const result = await model.generateContent(prompt)
+      const response = result.response
+      const text = response.text()
+      console.log("[v0] Gemini response received:", text.substring(0, 200))
+      return text
+    } catch (error: any) {
+      const isQuotaError =
+        error?.message?.includes("quota") ||
+        error?.message?.includes("429") ||
+        error?.message?.includes("RESOURCE_EXHAUSTED")
 
-    return Response.json(object)
-  } catch (error) {
+      if (isQuotaError && i < retries - 1) {
+        const waitTime = Math.pow(2, i) + 1 // 2s, 5s, 9s
+        console.log(`[v0] Quota hit. Retrying in ${waitTime}s...`)
+        await new Promise((resolve) => setTimeout(resolve, waitTime * 1000))
+      } else {
+        throw error
+      }
+    }
+  }
+
+  throw new Error("Max retries reached")
+}
+
+export async function POST(req: Request) {
+  try {
+    const { message } = await req.json()
+
+    if (!message || typeof message !== "string") {
+      return Response.json({ error: "Invalid message provided" }, { status: 400 })
+    }
+
+    const text = await analyzeMessageWithRetry(message)
+
+    let analysis
+    try {
+      analysis = JSON.parse(text)
+    } catch (parseError) {
+      console.error("[v0] Failed to parse Gemini response:", text)
+      return Response.json({ error: "Failed to parse AI response" }, { status: 500 })
+    }
+
+    if (!analysis || typeof analysis.isScam !== "boolean") {
+      console.error("[v0] Invalid analysis structure:", analysis)
+      return Response.json({ error: "Invalid AI response format" }, { status: 500 })
+    }
+
+    if (!Array.isArray(analysis.indicators)) {
+      analysis.indicators = []
+    }
+
+    console.log("[v0] Analysis complete:", analysis.riskLevel, "confidence:", analysis.confidence)
+    return Response.json(analysis)
+  } catch (error: any) {
     console.error("[v0] Error in scam analysis:", error)
 
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    if (errorMessage.includes("credit card")) {
+    if (
+      error?.message?.includes("quota") ||
+      error?.message?.includes("429") ||
+      error?.message?.includes("RESOURCE_EXHAUSTED")
+    ) {
       return Response.json(
         {
-          error: "AI Gateway setup required. Please add a credit card to your Vercel account to enable scam detection.",
-          setupUrl: "https://vercel.com/account/billing",
+          error:
+            "Gemini API quota exceeded. The free tier has reached its limit. Please wait a few minutes or upgrade your API key at ai.google.dev.",
         },
-        { status: 402 },
+        { status: 429 },
       )
     }
 

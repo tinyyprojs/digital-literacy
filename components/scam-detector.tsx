@@ -37,6 +37,17 @@ export function ScamDetector() {
         body: JSON.stringify({ message }),
       })
 
+      if (response.status === 429) {
+        const errorData = await response.json()
+        setError({
+          message:
+            errorData.error ||
+            "API quota exceeded. The free tier has reached its limit. Please wait a few minutes and try again.",
+          setupUrl: "https://ai.google.dev/pricing",
+        })
+        return
+      }
+
       if (response.status === 402) {
         const errorData = await response.json()
         setError({
