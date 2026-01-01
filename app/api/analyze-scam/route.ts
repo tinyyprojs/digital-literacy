@@ -150,6 +150,16 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("[v0] Error in scam analysis:", error)
 
+    if (error?.message?.includes("API key expired") || error?.message?.includes("API_KEY_INVALID")) {
+      return Response.json(
+        {
+          error:
+            "Your Gemini API key has expired. Please get a new API key from ai.google.dev and update the GEMINI_API_KEY environment variable.",
+        },
+        { status: 401 },
+      )
+    }
+
     if (
       error?.message?.includes("quota") ||
       error?.message?.includes("429") ||
