@@ -14,7 +14,7 @@ export function Hero() {
           </div>
 
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance">
-            Avoiding Scams in the Digital World
+            Avoiding Scams in the Online World
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground text-pretty max-w-3xl mx-auto leading-relaxed">
