@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai"
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyD8IjkAlyNlxLwQ4Zyq1hGATnD6OrSXFgc")
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyBXGbLeXjDpNDlU1x--KRohhxBURQlAu3c")
 
 async function analyzeMessageWithRetry(message: string, retries = 3): Promise<any> {
   const model = genAI.getGenerativeModel({

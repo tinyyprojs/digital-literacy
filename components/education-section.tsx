@@ -104,7 +104,7 @@ export function EducationSection() {
     <section id="learn" className="py-20 px-4 bg-section-bg">
       <div className="container max-w-7xl mx-auto space-y-16">
         <div className="text-center space-y-4">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Learn to Spot the Signs</h2>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Spotting the Signs</h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Understanding common scam tactics is a good defense. Here are the signs to watch out for.
           </p>
