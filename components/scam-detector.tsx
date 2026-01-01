@@ -105,7 +105,7 @@ export function ScamDetector() {
                 <Shield className="w-5 h-5 text-primary" />
                 Message Analysis
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-foreground">
                 Enter the suspicious message below. Our AI will analyze it for common scam patterns and provide a
                 detailed risk assessment.
               </CardDescription>
@@ -215,13 +215,13 @@ export function ScamDetector() {
         </div>
 
         <div className="max-w-4xl mx-auto mt-8">
-          <Card className="bg-secondary/50 border-border">
+          <Card className="bg-warning/10 border-warning/30">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-accent mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-warning-foreground mt-0.5 flex-shrink-0" />
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">Important Note</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm font-semibold text-warning-foreground">Important Note</p>
+                  <p className="text-sm text-warning-foreground/80 leading-relaxed">
                     This AI tool provides guidance but is not 100% accurate. Always use your judgment and verify
                     suspicious messages through official channels before taking any action.
                   </p>
