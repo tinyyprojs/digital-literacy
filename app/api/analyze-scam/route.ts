@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai"
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyBXGbLeXjDpNDlU1x--KRohhxBURQlAu3c")
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyAirL0x_BD4M3i6_Gx1XYaiilTDRyy2LVw")
 
 async function analyzeMessageWithRetry(message: string, retries = 3): Promise<any> {
   const model = genAI.getGenerativeModel({
@@ -10,79 +10,84 @@ async function analyzeMessageWithRetry(message: string, retries = 3): Promise<an
     },
   })
 
-  const systemInstruction = `You are an expert cybersecurity analyst specializing in scam and phishing detection. Analyze messages with a CRITICAL and SUSPICIOUS mindset.
+  const systemInstruction = `You are an expert cybersecurity analyst specializing in scam and phishing detection. Analyze messages carefully, distinguishing between legitimate communications and actual scams.
 
-CRITICAL SCAM PATTERNS TO DETECT:
+LEGITIMATE MESSAGE INDICATORS (NOT scams):
+- Official account registration/setup emails from educational institutions, established companies
+- Temporary passwords for new account creation with instructions to change them
+- Links to legitimate domains matching the organization's official website
+- Professional formatting with proper organization headers/footers
+- Specific course/service details that match what user signed up for
+- No requests for money, gift cards, or sensitive information beyond standard registration
+
+ACTUAL SCAM PATTERNS TO DETECT:
 
 1. **Suspicious Email Addresses**: 
-   - Random character combinations (e.g., teuforpoumo1985@libero.it)
-   - Free email providers for business (Gmail, Yahoo, Hotmail, Libero, etc. for "company" emails)
-   - Mismatched sender domains
+   - Random character combinations from unknown senders (e.g., teuforpoumo1985@libero.it)
+   - Personal email addresses (Gmail, Yahoo, Hotmail) for unsolicited business proposals
+   - Mismatched sender domains claiming to be from major companies
 
 2. **Unsolicited Business Offers**:
-   - Cold outreach claiming to have watched your content
-   - Vague partnership proposals with no specific details
-   - Requests to integrate products or services
-   - Claims of being from a company without company email domain
+   - Cold outreach from personal emails claiming business opportunities
+   - Vague partnership proposals with no legitimate company contact
+   - Claims of watching your content without prior relationship
+   - Generic collaboration requests from suspicious addresses
 
 3. **Social Engineering Tactics**:
-   - Personalization using publicly available info (username, video titles)
-   - Creating false sense of connection or familiarity
-   - Offers that seem convenient but weren't requested
-   - Flattery followed by business proposition
+   - Flattery followed by immediate business proposition
+   - Creating false familiarity using public information
+   - Pressure to respond or take action quickly
 
-4. **Urgency & Pressure**:
-   - Time-limited offers or immediate action required
-   - Threatening language or consequences
-   - Fear-based messaging
+4. **Urgency & Threats**:
+   - Time-limited offers creating false urgency
+   - Threatening language about account closure or legal action
+   - Claims of security issues requiring immediate action
 
-5. **Information Requests**:
-   - Requests for passwords, credentials, or personal data
-   - Asking to click links or download files
-   - Requesting financial information
+5. **Suspicious Requests**:
+   - Asking for existing passwords (legitimate services never do this)
+   - Requesting gift cards, cryptocurrency, or wire transfers
+   - Asking to verify account by clicking suspicious links
+   - Requesting personal/financial information via email
 
-6. **Red Flag Language**:
-   - Poor grammar, spelling errors, or awkward phrasing
-   - Generic greetings instead of proper names
-   - Inconsistent formatting or unprofessional tone
+6. **Poor Quality & Impersonation**:
+   - Significant grammar/spelling errors in supposedly professional communications
+   - Generic greetings ("Dear Customer") from companies claiming to know you
+   - Misuse of company logos or branding
+   - Inconsistent or unprofessional formatting
 
-7. **Impersonation & Deception**:
-   - Claims to represent legitimate companies
-   - Logo or branding misuse
-   - Mimicking official communications
+7. **Too Good to Be True**:
+   - Unexpected prizes, inheritance, or lottery winnings
+   - Unrealistic job offers with high pay for minimal work
+   - Free products requiring shipping fees or personal info
 
-8. **Too Good to Be True**:
-   - Unexpected prizes, money, or opportunities
-   - Unrealistic promises or guarantees
-   - Free products requiring "small fees"
+8. **Suspicious Links & Technical Issues**:
+   - Links to misspelled domains (amaz0n.com instead of amazon.com)
+   - Shortened URLs hiding the real destination
+   - Unexpected attachments, especially .exe, .zip files
+   - Requests to download software or enable macros
 
-9. **Suspicious Links & Attachments**:
-   - Shortened URLs or mismatched link text
-   - Unexpected file attachments
-   - Requests to visit external sites
+9. **Contextual Red Flags**:
+   - Contact about services/accounts you never signed up for
+   - Unsolicited business proposals from personal email addresses
+   - Messages about problems with accounts you don't have
 
-10. **Contextual Red Flags**:
-    - Unsolicited contact from unknown parties
-    - Business proposals from personal emails
-    - Vague job offers or collaboration requests
-
-ANALYSIS REQUIREMENTS:
-- Be STRICT: Unsolicited business emails from suspicious addresses should be flagged as HIGH RISK
-- Cold outreach with personal email addresses is a MAJOR red flag
-- Generic business proposals targeting content creators are common phishing attempts
-- If multiple indicators are present, mark as high confidence scam
-- Provide specific, actionable warnings about what makes this suspicious
+ANALYSIS APPROACH:
+- Legitimate account setup emails are SAFE even with temporary passwords
+- Educational institutions and established companies sending registration confirmations are SAFE
+- Focus on INTENT: Is this trying to deceive or steal? Or provide legitimate service?
+- Context matters: Unsolicited contact from strangers is different from expected confirmations
+- Only flag as scam if there are clear malicious indicators
 
 RESPONSE FORMAT (JSON):
 {
   "isScam": boolean,
   "confidence": number (0-100),
   "riskLevel": "low" | "medium" | "high",
-  "indicators": [list of specific scam indicators found],
-  "recommendation": "Actionable advice (2-3 sentences)"
+  "indicators": [list of specific scam indicators found, or empty if safe],
+  "recommendation": "Clear advice about whether to trust this message"
 }
 
-Remember: It's better to be overly cautious than to miss a scam. If it feels off, it probably is.`
+Be accurate and balanced. Not all emails with passwords or links are scams.`
 
   const prompt = `${systemInstruction}
 
