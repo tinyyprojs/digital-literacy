@@ -1,114 +1,109 @@
-import { GoogleGenerativeAI } from "@google/generative-ai"
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyAirL0x_BD4M3i6_Gx1XYaiilTDRyy2LVw")
-
 async function analyzeMessageWithRetry(message: string, retries = 3): Promise<any> {
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
-    generationConfig: {
-      responseMimeType: "application/json",
-    },
-  })
+  const apiKey = process.env.TYPHOON_API_KEY || "sk-dugg5PMwyI3cWNQ7353l3Q2Xvcaf4e9PEJBsMJSJ8XJDVZ03"
+  const apiUrl = "https://api.opentyphoon.ai/v1/chat/completions"
 
-  const systemInstruction = `You are an expert cybersecurity analyst specializing in scam and phishing detection. Analyze messages carefully, distinguishing between legitimate communications and actual scams.
+  const systemInstruction = `You are an expert cybersecurity analyst specializing in scam and phishing detection. Be STRICT and SUSPICIOUS of unsolicited messages.
 
-LEGITIMATE MESSAGE INDICATORS (NOT scams):
-- Official account registration/setup emails from educational institutions, established companies
-- Temporary passwords for new account creation with instructions to change them
-- Links to legitimate domains matching the organization's official website
-- Professional formatting with proper organization headers/footers
-- Specific course/service details that match what user signed up for
-- No requests for money, gift cards, or sensitive information beyond standard registration
+**CRITICAL SCAM INDICATORS - FLAG IMMEDIATELY:**
 
-ACTUAL SCAM PATTERNS TO DETECT:
+1. **Suspicious Email Addresses (HIGH RISK)**:
+   - Random character combinations: karpowiczleonorezn5@seznam.cz, teuforpoumo1985@libero.it
+   - Eastern European free email domains (seznam.cz, gazeta.pl, libero.it) for business
+   - Personal Gmail/Yahoo/Hotmail claiming to be from corporations
+   - Company name in email but wrong domain (TeamDJIPR@telenet.be is NOT DJI official)
+   - ISP domains (telenet.be, comcast.net) pretending to be companies
+   
+2. **Impersonation Red Flags (HIGH RISK)**:
+   - Misspelled company names: "DJÍ" with accent instead of "DJI"
+   - Generic business email from personal/ISP domains
+   - Claims to be from major companies but wrong email domain
+   - No legitimate corporate domain (@dji.com, @microsoft.com, etc.)
 
-1. **Suspicious Email Addresses**: 
-   - Random character combinations from unknown senders (e.g., teuforpoumo1985@libero.it)
-   - Personal email addresses (Gmail, Yahoo, Hotmail) for unsolicited business proposals
-   - Mismatched sender domains claiming to be from major companies
+3. **Unsolicited Business Outreach (MEDIUM-HIGH RISK)**:
+   - Cold messages from strangers offering business deals
+   - "I watched your content" from suspicious email addresses
+   - Partnership/collaboration offers from non-corporate emails
+   - Offering free products in exchange for promotion
+   - Generic marketing speak without specific details
+   - Using flattery then immediately asking for something
 
-2. **Unsolicited Business Offers**:
-   - Cold outreach from personal emails claiming business opportunities
-   - Vague partnership proposals with no legitimate company contact
-   - Claims of watching your content without prior relationship
-   - Generic collaboration requests from suspicious addresses
+4. **Context Violations**:
+   - Business proposals from personal emails
+   - Professional offers from free email services
+   - Company representatives using wrong domains
 
-3. **Social Engineering Tactics**:
-   - Flattery followed by immediate business proposition
-   - Creating false familiarity using public information
-   - Pressure to respond or take action quickly
+**LEGITIMATE MESSAGE INDICATORS (SAFE):**
+- Official domains matching organization (@omnicampus.edu, @university.edu, @company.com)
+- Expected account registration from services you signed up for
+- Proper institutional headers and contact information
+- Temporary passwords for new accounts with change instructions
+- No requests for money, personal info, or immediate action
 
-4. **Urgency & Threats**:
-   - Time-limited offers creating false urgency
-   - Threatening language about account closure or legal action
-   - Claims of security issues requiring immediate action
+**DETECTION RULES:**
+- Personal/ISP email + business proposal = SCAM
+- Misspelled company name = SCAM  
+- Eastern European free email + English business = SCAM
+- "I watched your video" from random email = SCAM
+- Free product offer from suspicious email = SCAM
+- Any message from: seznam.cz, gazeta.pl emails claiming business = HIGH RISK
 
-5. **Suspicious Requests**:
-   - Asking for existing passwords (legitimate services never do this)
-   - Requesting gift cards, cryptocurrency, or wire transfers
-   - Asking to verify account by clicking suspicious links
-   - Requesting personal/financial information via email
-
-6. **Poor Quality & Impersonation**:
-   - Significant grammar/spelling errors in supposedly professional communications
-   - Generic greetings ("Dear Customer") from companies claiming to know you
-   - Misuse of company logos or branding
-   - Inconsistent or unprofessional formatting
-
-7. **Too Good to Be True**:
-   - Unexpected prizes, inheritance, or lottery winnings
-   - Unrealistic job offers with high pay for minimal work
-   - Free products requiring shipping fees or personal info
-
-8. **Suspicious Links & Technical Issues**:
-   - Links to misspelled domains (amaz0n.com instead of amazon.com)
-   - Shortened URLs hiding the real destination
-   - Unexpected attachments, especially .exe, .zip files
-   - Requests to download software or enable macros
-
-9. **Contextual Red Flags**:
-   - Contact about services/accounts you never signed up for
-   - Unsolicited business proposals from personal email addresses
-   - Messages about problems with accounts you don't have
-
-ANALYSIS APPROACH:
-- Legitimate account setup emails are SAFE even with temporary passwords
-- Educational institutions and established companies sending registration confirmations are SAFE
-- Focus on INTENT: Is this trying to deceive or steal? Or provide legitimate service?
-- Context matters: Unsolicited contact from strangers is different from expected confirmations
-- Only flag as scam if there are clear malicious indicators
-
-RESPONSE FORMAT (JSON):
+**RESPONSE FORMAT (JSON):**
 {
   "isScam": boolean,
   "confidence": number (0-100),
   "riskLevel": "low" | "medium" | "high",
-  "indicators": [list of specific scam indicators found, or empty if safe],
-  "recommendation": "Clear advice about whether to trust this message"
+  "indicators": [specific red flags found],
+  "recommendation": "Clear warning about why this is suspicious"
 }
 
-Be accurate and balanced. Not all emails with passwords or links are scams.`
-
-  const prompt = `${systemInstruction}
-
-Message to analyze:
-"""
-${message}
-"""`
+Be HIGHLY SUSPICIOUS of unsolicited business messages from personal emails. When in doubt, flag it.`
 
   for (let i = 0; i < retries; i++) {
     try {
-      console.log(`[v0] Attempt ${i + 1} to analyze message`)
-      const result = await model.generateContent(prompt)
-      const response = result.response
-      const text = response.text()
-      console.log("[v0] Gemini response received:", text.substring(0, 200))
+      console.log(`[v0] Attempt ${i + 1} to analyze message with Typhoon AI`)
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "typhoon-v2.5-30b-a3b-instruct",
+          messages: [
+            {
+              role: "system",
+              content: systemInstruction,
+            },
+            {
+              role: "user",
+              content: `Message to analyze:\n"""\n${message}\n"""`,
+            },
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.3,
+          max_tokens: 2500,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error("[v0] Typhoon API error:", response.status, errorData)
+        throw new Error(`Typhoon API error: ${response.status} ${JSON.stringify(errorData)}`)
+      }
+
+      const data = await response.json()
+      const text = data.choices[0]?.message?.content
+
+      if (!text) {
+        throw new Error("No content in Typhoon API response")
+      }
+
+      console.log("[v0] Typhoon AI response received:", text.substring(0, 200))
       return text
     } catch (error: any) {
       const isQuotaError =
-        error?.message?.includes("quota") ||
-        error?.message?.includes("429") ||
-        error?.message?.includes("RESOURCE_EXHAUSTED")
+        error?.message?.includes("quota") || error?.message?.includes("429") || error?.message?.includes("rate limit")
 
       if (isQuotaError && i < retries - 1) {
         const waitTime = Math.pow(2, i) + 1 // 2s, 5s, 9s
@@ -135,9 +130,18 @@ export async function POST(req: Request) {
 
     let analysis
     try {
-      analysis = JSON.parse(text)
+      let cleanedText = text.trim()
+
+      // Remove \`\`\`json and \`\`\` wrapper if present
+      if (cleanedText.startsWith("```json")) {
+        cleanedText = cleanedText.replace(/^```json\s*\n?/, "").replace(/\n?```\s*$/, "")
+      } else if (cleanedText.startsWith("```")) {
+        cleanedText = cleanedText.replace(/^```\s*\n?/, "").replace(/\n?```\s*$/, "")
+      }
+
+      analysis = JSON.parse(cleanedText.trim())
     } catch (parseError) {
-      console.error("[v0] Failed to parse Gemini response:", text)
+      console.error("[v0] Failed to parse Typhoon AI response:", text)
       return Response.json({ error: "Failed to parse AI response" }, { status: 500 })
     }
 
@@ -155,11 +159,11 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("[v0] Error in scam analysis:", error)
 
-    if (error?.message?.includes("API key expired") || error?.message?.includes("API_KEY_INVALID")) {
+    if (error?.message?.includes("API key") || error?.message?.includes("401")) {
       return Response.json(
         {
           error:
-            "Your Gemini API key has expired. Please get a new API key from ai.google.dev and update the GEMINI_API_KEY environment variable.",
+            "Your Typhoon API key is invalid or expired. Please update the TYPHOON_API_KEY environment variable with a valid key.",
         },
         { status: 401 },
       )
@@ -168,12 +172,11 @@ export async function POST(req: Request) {
     if (
       error?.message?.includes("quota") ||
       error?.message?.includes("429") ||
-      error?.message?.includes("RESOURCE_EXHAUSTED")
+      error?.message?.includes("rate limit")
     ) {
       return Response.json(
         {
-          error:
-            "Gemini API quota exceeded. The free tier has reached its limit. Please wait a few minutes or upgrade your API key at ai.google.dev.",
+          error: "Typhoon API rate limit exceeded. Please wait a few minutes before trying again.",
         },
         { status: 429 },
       )
